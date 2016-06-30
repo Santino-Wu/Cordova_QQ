@@ -6,6 +6,7 @@ NSString *QQ_PARAM_NOT_FOUND = @"param is not found";
 NSString *QQ_LOGIN_ERROR = @"QQ login error";
 NSString *QQ_LOGIN_CANCEL = @"QQ login cancelled";
 NSString *QQ_LOGIN_NETWORK_ERROR = @"QQ login network error";
+NSString *QQ_UIN_INVALID = @"QQ uin is invalid";
 
 @implementation YCQQ
 /**
@@ -127,6 +128,40 @@ NSString *QQ_LOGIN_NETWORK_ERROR = @"QQ login network error";
         CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:QQ_PARAM_NOT_FOUND];
         [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }
+}
+
+/**
+ *  调用WAP，发起QQ临时会话
+ *
+ *  @param command CDVInvokedUrlCommand
+ */
+- (void)openWPA:(CDVInvokedUrlCommand *)command {
+    NSString *uin = [command.arguments objectAtIndex:0];
+
+    if (![self isUinValid:uin]) {
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:QQ_UIN_INVALID];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+
+        return;
+    }
+
+    self.callback = command.callbackId;
+
+    QQApiWPAObject *wpaObj = [QQApiWPAObject objectWithUin:uin];
+    SendMessageToQQReq *req = [SendMessageToQQReq reqWithContent:wpaObj];
+    QQApiSendResultCode sent = [QQApiInterface sendReq:req];
+    [self handleSendResult:sent];
+}
+
+- (Boolean)isUinValid:(NSString *)uin {
+    NSString *regex = @"^[1-9]\\d{4,}$";
+    NSPredicate *test = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", regex];
+
+    if ([test evaluateWithObject: uin]) {
+        return true;
+    }
+
+    return false;
 }
 
 /**

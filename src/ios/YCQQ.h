@@ -19,4 +19,6 @@
 - (void)checkClientInstalled:(CDVInvokedUrlCommand *)command;
 
 - (void)addToQQFavorites:(CDVInvokedUrlCommand *)command;
+
+- (void)openWPA:(CDVInvokedUrlCommand *)command;
 @end

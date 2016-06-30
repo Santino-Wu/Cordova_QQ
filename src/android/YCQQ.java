@@ -39,6 +39,8 @@ public class YCQQ extends CordovaPlugin {
     private static final String QQ_Client_NOT_INSYALLED_ERROR = "QQ client is not installed";
     private static final String TITLIE_IS_EMPTY = "share title is empty";
     private static final String URL_IS_EMPTY = "share url is empty";
+    private static final String QQ_UIN_INVALID = "QQ uin is invalid";
+    private static final String QQ_WPA_FAILURE = "Failed to open WPA";
 
     @Override
     protected void pluginInitialize() {
@@ -68,6 +70,9 @@ public class YCQQ extends CordovaPlugin {
         }
         if (action.equalsIgnoreCase("addToQQFavorites")) {
             return addToQQFavorites(args, callbackContext);
+        }
+        if (action.equalsIgnoreCase("openWPA")) {
+            return openWPA(args, callbackContext);
         }
         return super.execute(action, args, callbackContext);
     }
@@ -237,6 +242,32 @@ public class YCQQ extends CordovaPlugin {
             }
         });
         return true;
+    }
+
+    private boolean openWPA(JSONArray args, CallbackContext callbackContext) throws JSONException {
+        final String uin = args.getString(0);
+
+        if (false == isUinValid(uin)) {
+            callbackContext.error(QQ_UIN_INVALID);
+
+            return true;
+        }
+
+        final int ret = mTencent.startWPAConversation(cordova.getActivity(), uin, "");
+
+        if (0 != ret) {
+            callbackContext.error(QQ_WPA_FAILURE);
+
+            return true;
+        }
+
+        callbackContext.success();
+
+        return true;
+    }
+
+    private boolean isUinValid(String uin) {
+        return uin.matches("^[1-9]\\d{4,}$");
     }
 
     /**

@@ -3,6 +3,9 @@ var exec    = require('cordova/exec'),
 cordova = require('cordova');
 
 module.exports = {
+    openWPA: function (successCallback, errorCallback, uin) {
+		exec(successCallback, errorCallback, "YCQQ", "openWPA", [ (uin || '') ]);
+    },
 	ssoLogin:function(successCallback, errorCallback,args){
 		if(args == null || args == undefined){
 			args = 0;
@@ -77,4 +80,3 @@ module.exports = {
 	}
 
 };
-
